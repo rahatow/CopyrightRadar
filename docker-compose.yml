@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    environment:
+      # Optional. If empty, the app generates a key into data/ on first start.
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-}
+    volumes:
+      - ./data:/srv/data
+      - ./config:/srv/config:ro
+    ports:
+      # Local only. Put a reverse proxy with HTTPS in front for network access.
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped

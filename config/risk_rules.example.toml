@@ -1,0 +1,25 @@
+# Copy to config/risk_rules.toml and edit for your studio.
+# Matching is case-insensitive, whole words ("EMI" does not match "Epidemic"). See docs/SPEC.md, section 8.
+version = "example-1"
+
+# Major labels and their imprints: a match here means "high".
+commercial_labels = [
+  "Universal", "Sony", "Warner", "Atlantic", "Columbia", "Interscope", "Island",
+  "Republic", "Def Jam", "Capitol", "RCA", "Epic", "Parlophone", "Polydor",
+  "Virgin", "EMI", "Elektra", "Geffen", "Motown", "Arista", "Ministry of Sound",
+]
+
+# Sources the platform licenses for this use.
+safe_sources = ["Facebook Sound Collection"]
+
+# Stock libraries: "medium" unless listed in licensed_sources.
+stock_libraries = ["Epidemic Sound", "Artlist", "Musicbed", "Soundstripe", "Envato", "AudioJungle"]
+
+# Libraries your studio holds a written licence for (move names here from stock_libraries).
+licensed_sources = []
+
+# ACRCloud score below this counts as a weak match ("unknown").
+min_score = 70
+
+# Level for "not recognized". Fingerprinting misses covers and music under voice.
+unrecognized_level = "low"
