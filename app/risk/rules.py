@@ -53,13 +53,13 @@ class MediaSignals:
     meta_status: str | None = None  # raw Meta status, kept as is
     meta_matches: list[MetaMatch] = field(default_factory=list)
     recognitions: list[Recognition] = field(default_factory=list)
-    manual_verdict: str | None = None  # "confirmed_risk" | "cleared"
+    manual_verdict: str | None = None  # "confirmed_risk" | "cleared" | "no_music"
 
 
 @dataclass
 class Assessment:
     level: str
-    reasons: list[str]
+    reasons: list[dict]
     rules_version: str
     automatic_level: str
 
@@ -75,47 +75,48 @@ def _worst(levels: list[str]) -> str:
     return min(levels, key=lambda lvl: _RANK[lvl])
 
 
-def _meta_level(m: MetaMatch, rules: RiskRules) -> tuple[str, str]:
+def _track(r: Recognition) -> dict:
+    return {"title": r.title, "artists": r.artists, "label": r.label, "score": r.score}
+
+
+def _meta_level(m: MetaMatch, rules: RiskRules) -> tuple[str, dict]:
     src = m.owner_copyright_policy or m.author or "?"
-    if _contains_any(m.owner_copyright_policy, rules.safe_sources) or _contains_any(
-        m.author, rules.safe_sources
-    ):
-        return "low", f"Meta: match in safe source ({src})"
-    return "high", f"Meta: match with rights holder ({src})"
+    if _contains_any(m.owner_copyright_policy, rules.safe_sources) or _contains_any(m.author, rules.safe_sources):
+        return "low", {"k": "meta_safe", "src": src}
+    return "high", {"k": "meta_holder", "src": src}
 
 
-def _recognition_level(r: Recognition, rules: RiskRules) -> tuple[str, str]:
+def _recognition_level(r: Recognition, rules: RiskRules) -> tuple[str, dict]:
     if r.status == "error":
-        return "unknown", "ACRCloud: recognition error"
+        return "unknown", {"k": "acr_error"}
     if r.status == "no_match":
-        return (
-            rules.unrecognized_level,
-            "ACRCloud: not recognized; fingerprinting misses covers, remixes "
-            "and music under voice - listen to it",
-        )
-    track = f"{r.artists or '?'} - {r.title or '?'} [{r.label or 'no label'}], score {r.score}"
+        return rules.unrecognized_level, {"k": "acr_no_match"}
+    t = _track(r)
     if r.score is not None and r.score < rules.min_score:
-        return "unknown", f"ACRCloud: weak match ({track})"
+        return "unknown", {"k": "acr_weak", **t}
     if r.is_cover:
-        return "high", f"ACRCloud: cover of a known song ({track})"
+        return "high", {"k": "acr_cover", **t}
     if _contains_any(r.label, rules.licensed_sources):
-        return "low", f"ACRCloud: source licensed by the studio ({track})"
+        return "low", {"k": "acr_licensed", **t}
     if _contains_any(r.label, rules.safe_sources):
-        return "low", f"ACRCloud: safe source ({track})"
+        return "low", {"k": "acr_safe", **t}
     if _contains_any(r.label, rules.commercial_labels):
-        return "high", f"ACRCloud: commercial label ({track})"
+        return "high", {"k": "acr_commercial", **t}
     if _contains_any(r.label, rules.stock_libraries):
-        return "medium", f"ACRCloud: stock library without licence on file ({track})"
-    return "medium", f"ACRCloud: independent or unknown label ({track})"
+        return "medium", {"k": "acr_stock", **t}
+    return "medium", {"k": "acr_independent", **t}
 
 
 def assess(signals: MediaSignals, rules: RiskRules) -> Assessment:
-    """Return the risk level and the reasons for one media item."""
-    reasons: list[str] = []
+    """Return the risk level and the reasons for one media item.
+
+    Reasons are dicts {"k": <key>, ...}; the UI translates them (DE/EN/RU).
+    """
+    reasons: list[dict] = []
 
     if signals.has_audio_stream is False:
         auto = "no_audio"
-        reasons.append("Video has no audio track")
+        reasons.append({"k": "no_audio_track"})
         reasons += [_meta_level(m, rules)[1] for m in signals.meta_matches]
     else:
         levels: list[str] = []
@@ -129,21 +130,22 @@ def assess(signals: MediaSignals, rules: RiskRules) -> Assessment:
             reasons.append(why)
         if signals.music_detected is False and not levels:
             levels.append("no_music")
-            reasons.append("No music detected")
-        if not levels:
+            reasons.append({"k": "no_music_detected"})
+        if not levels and signals.has_audio_stream:
+            levels.append("unknown")
+            reasons.append({"k": "not_recognized_yet", "meta_status": signals.meta_status})
+        elif not levels:
             # No audio for recognition and no Meta match. Meta "no match" never lowers risk.
             levels.append("unknown")
-            reasons.append(
-                f"No audio for recognition; Meta status: {signals.meta_status or 'not available'}"
-            )
+            reasons.append({"k": "no_audio_for_recognition", "meta_status": signals.meta_status})
+        elif not signals.meta_matches and signals.meta_status:
+            reasons.append({"k": "meta_status", "meta_status": signals.meta_status})
         auto = _worst(levels)
 
     level = auto
-    if signals.manual_verdict == "confirmed_risk":
-        level = "high"
-        reasons.insert(0, "Manual review: risk confirmed")
-    elif signals.manual_verdict == "cleared":
-        level = "low"
-        reasons.insert(0, "Manual review: checked, cleared")
+    manual = {"confirmed_risk": "high", "cleared": "low", "no_music": "no_music"}
+    if signals.manual_verdict in manual:
+        level = manual[signals.manual_verdict]
+        reasons.insert(0, {"k": f"manual_{signals.manual_verdict}"})
 
     return Assessment(level=level, reasons=reasons, rules_version=rules.version, automatic_level=auto)

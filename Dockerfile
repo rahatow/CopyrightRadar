@@ -5,16 +5,17 @@ WORKDIR /srv
 COPY pyproject.toml ./
 COPY app ./app
 COPY config ./config
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir -e .
 
 FROM base AS test
-RUN pip install --no-cache-dir ".[dev]"
+RUN pip install --no-cache-dir -e ".[dev]"
 COPY tests ./tests
 CMD ["pytest", "-q"]
 
 FROM base AS runtime
-# TODO v0.1: entrypoint must fix ownership of the ./data bind mount (Docker creates it as root).
 RUN useradd --create-home app && mkdir -p /srv/data && chown app /srv/data
-USER app
+COPY docker/entrypoint.sh /entrypoint.sh
+ENV DATA_DIR=/srv/data
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["uvicorn", "app.main:app_factory", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ t.title }}</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a class="brand" href="/">{{ t.title }}</a>
+    <span class="spacer"></span>
+    {% block nav %}{% endblock %}
+    <div class="lang" role="group" aria-label="Language">
+      {% for l in langs %}<a href="?lang={{ l }}" aria-current="{{ 'true' if l == lang else 'false' }}" data-l="{{ l }}">{{ l|upper }}</a>{% endfor %}
+    </div>
+  </nav>
+  {% block body %}{% endblock %}
+  <footer class="disclaimer">{{ t.disclaimer }}</footer>
+</div>
+</body>
+</html>

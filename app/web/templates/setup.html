@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block nav %}{% if s.has_password %}<a href="/">{{ t.go_main }}</a>{% endif %}{% endblock %}
+{% block body %}
+<main class="narrow" id="step">
+  <h1>{{ t.setup_title }}</h1>
+  <p class="muted">{{ t.setup_intro }}</p>
+  {% if msg and t.msg[msg] %}<p class="msg ok">{{ t.msg[msg] }}</p>{% endif %}
+  {% if err and t.err[err] %}<p class="msg err">{{ t.err[err] }}</p>{% endif %}
+
+  <section class="card">
+    <h2>{{ t.step1 }} <span class="status {{ 'done' if s.has_password }}">{{ t.status_ok if s.has_password else t.status_todo }}</span></h2>
+    <p class="muted">{{ t.step1_help }}</p>
+    <form method="post" action="/setup/password" class="stack">
+      <label>{{ t.password }}<input type="password" name="password" minlength="10" autocomplete="new-password" required></label>
+      <label>{{ t.password2 }}<input type="password" name="password2" minlength="10" autocomplete="new-password" required></label>
+      <button class="btn">{{ t.save_check }}</button>
+    </form>
+  </section>
+
+  {% if s.has_password %}
+  <section class="card">
+    <h2>{{ t.step2 }} <span class="status {{ 'done' if s.account }}">{{ ('@' ~ s.account.username) if s.account else t.status_todo }}</span></h2>
+    <ol class="help">{% for line in t.step2_help %}<li>{{ line }}</li>{% endfor %}</ol>
+    {% if s.account %}<p class="muted">{{ t.copyright_yes if s.copyright_supported else t.copyright_no }}</p>{% endif %}
+    <form method="post" action="/setup/instagram" class="stack">
+      <label>{{ t.token }}<input type="password" name="token" autocomplete="off" required></label>
+      <button class="btn">{{ t.save_check }}</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>{{ t.step3 }} <span class="status {{ 'done' if s.acr_saved }}">{{ t.status_ok if s.acr_saved else t.status_todo }}</span></h2>
+    <ol class="help">{% for line in t.step3_help %}<li>{{ line }}</li>{% endfor %}</ol>
+    <form method="post" action="/setup/acrcloud" class="stack">
+      <label>{{ t.host }}<input name="host" placeholder="identify-eu-west-1.acrcloud.com" required></label>
+      <label>{{ t.access_key }}<input name="key" autocomplete="off" required></label>
+      <label>{{ t.access_secret }}<input type="password" name="secret" autocomplete="off" required></label>
+      <button class="btn">{{ t.save_check }}</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>{{ t.step4 }} <span class="status {{ 'done' if s.synced }}">{{ t.status_ok if s.synced else t.status_todo }}</span></h2>
+    <ol class="help">{% for line in t.step4_help %}<li>{{ line }}</li>{% endfor %}</ol>
+    <a class="btn" href="/">{{ t.go_main }}</a>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

@@ -52,7 +52,7 @@ def test_stock_without_and_with_licence():
 def test_not_recognized_is_low_and_says_listen():
     a = assess(MediaSignals(True, recognitions=[Recognition(status="no_match")]), RULES)
     assert a.level == "low"
-    assert "listen" in a.reasons[0]
+    assert a.reasons[0]["k"] == "acr_no_match"
 
 
 def test_manual_verdict_overrides_but_keeps_automatic():
@@ -64,3 +64,8 @@ def test_label_match_is_whole_word():
     # "EMI" is in the commercial list and inside "Epidemic"; it must not match.
     assert assess(MediaSignals(True, recognitions=[rec("Epidemic Sound")]), RULES).level == "medium"
     assert assess(MediaSignals(True, recognitions=[rec("EMI Records")]), RULES).level == "high"
+
+
+def test_manual_no_music():
+    a = assess(MediaSignals(True, recognitions=[rec("Indie")], manual_verdict="no_music"), RULES)
+    assert a.level == "no_music" and a.reasons[0]["k"] == "manual_no_music"

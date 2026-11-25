@@ -6,15 +6,19 @@ Self-hosted tool for a studio, salon, clinic or any small business: check the mu
 
 > **Not legal advice.** The tool shows risk indicators from Meta's copyright check and from audio recognition (ACRCloud). Whether to remove a post, and how to answer a claim, is a decision for you and your lawyer.
 
-Status: **pre-alpha scaffold.** The spec is in [docs/SPEC.md](docs/SPEC.md) (Russian for now). License: [AGPL-3.0](LICENSE).
+Status: **v0.1, early.** Tested with automated tests and a demo; not yet run against a real Meta app or a real ACRCloud key. The spec is in [docs/SPEC.md](docs/SPEC.md) (Russian for now). License: [AGPL-3.0](LICENSE).
 
-## What it does (v0.1 target)
+## What it does
 
-- Reads your Reels list and Meta's `copyright_check_information` (read-only: GET requests only, nothing is posted, archived or deleted).
-- Recognises the music with **your own** ACRCloud key (15-second fragments).
-- Gives each Reel a risk level with reasons: high, medium, unknown, low, no music, no sound. Rules are a config file you can edit.
-- Shows an Instagram-like grid with "In feed" and "Archive" tabs, a post card, manual review, and a CSV export.
-- UI in German (default), English and Russian.
+- **Reads** your posts and Meta's `copyright_check_information` through the Instagram API with Instagram Login. Read-only: GET requests only; nothing is posted, archived or deleted.
+- **Imports your Instagram data export** (ZIP, JSON format). Meta does not let apps download videos with copyrighted music, so the export is the only way to analyse exactly the riskiest Reels. It also shows posts that are already in the Instagram archive. Works even without a Meta app.
+- **Recognises the music** with **your own** ACRCloud key: up to three 15-second fragments per video (start, middle, end).
+- **Rates each post**: high, medium, unknown, low, no music, no sound — with reasons. The rules are a config file. Meta's "no match" never lowers a risk level.
+- **Instagram-like page**: grid with risk badges, filter chips, tabs "In feed" / "Archive" (photos inside the archive with a "Photo" flag), a post card with reasons, ACRCloud result, Meta history, audio player and the source of the audio.
+- **Refresh** compares the feed with Meta: posts that disappeared move to "Archive" with the check date, posts that came back return. Nothing changes when Meta's answer is incomplete, when a post has no link, or when more than 25 % of the feed disappears at once — then you confirm the exact number.
+- **Manual steps**: "Mark as archived" (for posts you archived in the app), review after listening (risk confirmed / OK / no music, with a note), upload a file for a single post.
+- **CSV export** for your lawyer, with the disclaimer.
+- **German (default), English, Russian.** Light and dark theme. Works on a phone.
 
 Everything runs on your machine. You use your own Meta app and your own ACRCloud key. The project authors receive no data.
 
@@ -27,9 +31,19 @@ git clone <repo-url> copyright-radar && cd copyright-radar
 docker compose up -d --build
 ```
 
-Optional: set `APP_SECRET_KEY` (see `.env.example`); otherwise the app creates a key in `data/`. To change the risk rules, copy `config/risk_rules.example.toml` to `config/risk_rules.toml` and edit it.
+Open http://127.0.0.1:8000 and follow the setup: password → Instagram token → ACRCloud key → Refresh → (optional) import your export.
 
-Open http://127.0.0.1:8000/health. The setup wizard (Meta app, Instagram token, ACRCloud key) comes in v0.1; see SPEC section 11.
+Try it without any accounts first (invented posts):
+
+```bash
+DEMO=1 docker compose up -d --build
+```
+
+Optional: set `APP_SECRET_KEY` (see `.env.example`); otherwise the app creates a key in `data/`. Change the risk rules: copy `config/risk_rules.example.toml` to `config/risk_rules.toml`, edit, restart. Another port: `PORT=8080 docker compose up -d`.
+
+**Access from other devices:** the container listens on 127.0.0.1 only. Put a reverse proxy with HTTPS in front (Caddy, nginx, Traefik) and keep the app's password login on.
+
+**Your data** stays in `./data`: the SQLite database, encrypted tokens, previews, downloaded and imported media. Back it up; delete it to remove everything.
 
 ## Run the tests
 
@@ -49,18 +63,27 @@ docker run --rm copyright-radar:test
 
 ```
 app/
-  instagram/   read-only Graph API client, sync guards
+  main.py      FastAPI: pages, JSON API, setup wizard, CSV export
+  service.py   analysis pipeline, export import, background worker
+  auth.py      password login, signed session, same-origin check
+  demo.py      DEMO=1 data
+  instagram/   read-only Graph API client, Refresh with guards
   recognition/ ACRCloud client
-  audio/       ffmpeg fragments
-  importer/    Instagram data export import
+  audio/       ffmpeg / ffprobe helpers
+  importer/    Instagram data export (ZIP) parser
   risk/        risk rules (pure functions)
   storage/     SQLite, encrypted secrets
-  setup/       setup wizard
-  web/         UI, i18n (de, en, ru)
+  web/         templates, static JS/CSS, i18n (de, en, ru)
 config/        risk_rules.example.toml
 docs/SPEC.md   specification
-tests/
+tests/         pytest (no network: fake Meta and ACRCloud)
 ```
+
+## Not verified yet
+
+- Whether Meta returns `copyright_check_information` through Instagram Login (the app probes it at setup and works without it).
+- The export parser was written against the known JSON layout and synthetic files; check it with a fresh real export.
+- Meta rate-limit error codes; ACRCloud with a real key.
 
 ## License
 

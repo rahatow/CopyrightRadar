@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block nav %}
+<a href="/export.csv">{{ t.export_csv }}</a>
+<a href="/setup">{{ t.settings }}</a>
+<form method="post" action="/logout" class="inline"><button class="link">{{ t.logout }}</button></form>
+{% endblock %}
+{% block body %}
+<main id="app" data-lang="{{ lang }}">
+  <header class="profile">
+    <div class="avatar" id="avatar" aria-hidden="true"></div>
+    <div class="pinfo">
+      <h1 class="handle" id="handle">{{ t.title }}</h1>
+      <div class="stats" id="stats"></div>
+      <p class="muted">{{ t.tagline }}</p>
+    </div>
+  </header>
+  <div class="notices" id="notices"></div>
+  <div class="toolbar">
+    <button class="btn" id="refresh">{{ t.refresh }}</button>
+    <button class="btn ghost" id="analyze-all">{{ t.analyze_all }}</button>
+    <label class="btn ghost file">{{ t.import }}<input type="file" id="import" accept=".zip" hidden></label>
+    <span class="muted" id="refresh-info"></span>
+    <span class="muted" id="jobs"></span>
+  </div>
+  <p class="msg" id="msg" role="status" aria-live="polite"></p>
+  <div class="chips" id="chips" role="group" aria-label="{{ t.filter }}"></div>
+  <div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-feed" aria-selected="true">{{ t.tab_feed }}</button>
+      <button class="tab" role="tab" id="tab-archive" aria-selected="false">{{ t.tab_archive }}</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>{{ t.empty }}</p>
+  </div>
+  <section class="notes">
+    <h2>{{ t.legend_h }}</h2>
+    <div class="legend" id="legend"></div>
+  </section>
+  <dialog id="dlg"></dialog>
+</main>
+<script src="/static/app.js"></script>
+{% endblock %}

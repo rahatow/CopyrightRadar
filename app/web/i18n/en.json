@@ -1,1 +1,209 @@
-{"disclaimer": "The risk assessment is not legal advice.", "tab_feed": "In feed", "tab_archive": "Archive", "refresh": "Refresh", "level_high": "High", "level_medium": "Medium", "level_unknown": "Unknown", "level_low": "Low", "level_no_music": "No music", "level_no_audio": "No sound"}
+{
+ "lang_name": "English",
+ "title": "CopyrightRadar",
+ "tagline": "Music check for your Instagram Reels",
+ "disclaimer": "The risk assessment is not legal advice. Decisions about posts and claims are yours and your lawyer's.",
+ "login_title": "Sign in",
+ "password": "Password",
+ "password2": "Repeat password",
+ "login_btn": "Sign in",
+ "login_error": "Wrong password.",
+ "logout": "Sign out",
+ "settings": "Settings",
+ "export_csv": "CSV export",
+ "setup_title": "Setup",
+ "setup_intro": "Four steps. The service only reads your Instagram account; it never posts, archives or deletes.",
+ "step1": "1. Password for this page",
+ "step1_help": "At least 10 characters. Only people with this password see the page.",
+ "step2": "2. Instagram (your own Meta app)",
+ "step2_help": [
+  "Your Instagram account must be a professional account (Business or Creator).",
+  "Open developers.facebook.com, create an app and add the Instagram product with Instagram login.",
+  "Permission needed: instagram_business_basic only. For your own account Standard Access is enough; no App Review.",
+  "If the app is in development mode, add your Instagram account as an Instagram Tester and accept the invite in Instagram.",
+  "Generate an access token for your account in the app dashboard and paste it here. It is valid for 60 days; the service renews it."
+ ],
+ "token": "Access token",
+ "save_check": "Save and check",
+ "step3": "3. ACRCloud (music recognition, your own key)",
+ "step3_help": [
+  "Create an ACRCloud account and an Audio & Video Recognition project of type Audio Fingerprinting.",
+  "Copy host (e.g. identify-eu-west-1.acrcloud.com), access key and access secret.",
+  "Recognition sends 15-second audio fragments to ACRCloud. Check ACRCloud's data processing terms for your records (DSGVO)."
+ ],
+ "host": "Host",
+ "access_key": "Access key",
+ "access_secret": "Access secret",
+ "step4": "4. First sync and export",
+ "step4_help": [
+  "Open the main page and press Refresh: the service reads your posts and Meta's copyright check.",
+  "Optional but recommended: download your Instagram data (Settings → Your activity → Download your information, format JSON) and import the ZIP on the main page. Meta does not let apps download videos with copyrighted music, so the export is the only way to analyse them."
+ ],
+ "go_main": "Open the main page",
+ "status_ok": "done",
+ "status_todo": "not done",
+ "copyright_yes": "Meta returns its copyright check for this account.",
+ "copyright_no": "Meta did not return its copyright check field for this account. The service works without it.",
+ "msg": {
+  "password_saved": "Password saved.",
+  "instagram_saved": "Instagram connected.",
+  "acr_saved": "ACRCloud connected."
+ },
+ "err": {
+  "password_rules": "Passwords must match and have at least 10 characters.",
+  "token_invalid": "Meta did not accept the token.",
+  "account_type": "This is not a professional Instagram account.",
+  "acr_host": "Host must look like identify-eu-west-1.acrcloud.com.",
+  "acr_key": "ACRCloud did not accept the key or secret.",
+  "acr_failed": "ACRCloud test failed.",
+  "no_token": "Instagram is not connected (Settings).",
+  "graph_failed": "Meta's answer was incomplete. Nothing changed.",
+  "too_many_missing": "Too many posts left the feed at once. Nothing changed.",
+  "refresh_running": "A check is already running.",
+  "too_soon": "Please wait a minute.",
+  "cross_origin_rejected": "Request from another site.",
+  "forbidden": "Please sign in again.",
+  "unknown_id": "Post not found.",
+  "not_in_feed": "The post is not in the feed.",
+  "not_marked": "The post was not marked by hand.",
+  "bad_verdict": "Invalid choice.",
+  "bad_export": "This ZIP is not an Instagram export in JSON format.",
+  "too_large": "File too large.",
+  "bad_file": "Unsupported file.",
+  "net": "Network error."
+ },
+ "tab_feed": "In feed",
+ "tab_archive": "Archive",
+ "all": "All",
+ "filter": "Filter by risk",
+ "empty": "Nothing here.",
+ "load_err": "Data did not load. Reload the page.",
+ "refresh": "Refresh",
+ "checking": "Checking…",
+ "analyze_all": "Analyse all videos",
+ "import": "Import Instagram export (ZIP)",
+ "importing": "Importing…",
+ "import_done": "Export: {files} files, {matched} matched to posts, {added} not in the feed, {archived} in the archive, {without_file} without a media file.",
+ "jobs": "Background: {pending} waiting",
+ "never_checked": "Feed not checked with Meta yet.",
+ "last_check": "Last check: {at}",
+ "confirm_mass": "{missing} of {feed} posts left the feed at once. Move them to the archive?",
+ "result": "In feed: {active}. Not in feed: {missing} (new: {newly_missing}). Back in feed: {returned}. New posts: {new_posts}.",
+ "still_visible": " {still_visible_manual} post(s) you marked as archived are still visible on Instagram.",
+ "stats": "<b>{feed}</b> in feed · <b>{archive}</b> in archive · <b>{high}</b> high risk in feed",
+ "no_meta_field": "Meta does not return its copyright check for this account; risk is based on recognition and your review.",
+ "no_acr": "ACRCloud is not connected: music is not recognised yet (Settings).",
+ "demo": "Demo mode: invented posts, nothing is real.",
+ "levels": {
+  "high": [
+   "High",
+   "Commercial label, cover of a known song, or Meta matched a rights holder."
+  ],
+  "medium": [
+   "Medium",
+   "Independent artist or stock music without a licence on file."
+  ],
+  "unknown": [
+   "Unknown",
+   "Not analysed, weak match, or no audio available. Needs a check."
+  ],
+  "low": [
+   "Low",
+   "Safe source (e.g. Facebook Sound Collection) or no music recognised. Listen to be sure."
+  ],
+  "no_music": [
+   "No music",
+   "No music detected or confirmed by listening."
+  ],
+  "no_audio": [
+   "No sound",
+   "The video has no audio track, or it is a photo."
+  ]
+ },
+ "todo": {
+  "high": "Consider archiving this post.",
+  "medium": "Decide: keep or archive. Check the licence.",
+  "unknown": "Listen to it and decide.",
+  "low": "Keep. Listen once if unsure.",
+  "no_music": "Nothing to do.",
+  "no_audio": "Nothing to do."
+ },
+ "flag": {
+  "photo": "Photo",
+  "export": "Export",
+  "missing": "Not in feed",
+  "manual": "Archived"
+ },
+ "rows": {
+  "why": "Why",
+  "date": "Date",
+  "acr": "ACRCloud",
+  "meta": "Meta check",
+  "audio": "Audio source",
+  "state": "Status",
+  "review": "Your review",
+  "link": "Link",
+  "caption": "Caption"
+ },
+ "state": {
+  "in_feed": "in feed",
+  "missing": "not found in feed at check {since}",
+  "archived_manual": "marked as archived {since}",
+  "archived_export": "in the Instagram archive (export)"
+ },
+ "audio": {
+  "api": "downloaded via API",
+  "export": "from the Instagram export",
+  "upload": "uploaded by hand",
+  "none": "no audio: Meta gives no file for this video. Import the export or upload the file.",
+  "no_stream": "file has no audio track"
+ },
+ "meta_status": {
+  "complete": "checked",
+  "completed": "checked",
+  "not_started": "not checked by Meta",
+  "in_progress": "in progress",
+  "error": "error"
+ },
+ "no_match": "no match",
+ "score": "score",
+ "mark_on": "Mark as archived",
+ "mark_off": "Back to feed",
+ "review_h": "After listening",
+ "review": {
+  "confirmed_risk": "Risk confirmed",
+  "cleared": "Checked, OK",
+  "no_music": "No music"
+ },
+ "review_clear": "Remove review",
+ "note": "Note",
+ "analyze": "Analyse again",
+ "upload": "Upload video/audio",
+ "open_ig": "Open on Instagram",
+ "close": "Close",
+ "not_saved": "Not saved: ",
+ "reasons": {
+  "not_analyzed": "Not analysed yet.",
+  "photo": "Photo: no sound.",
+  "no_audio_track": "The video has no audio track.",
+  "meta_safe": "Meta: match in a safe source ({src}).",
+  "meta_holder": "Meta: match with a rights holder ({src}).",
+  "meta_status": "Meta: no match (status: {meta_status}). Meta misses tracks, so this is a weak signal.",
+  "acr_error": "ACRCloud: recognition failed.",
+  "acr_no_match": "ACRCloud: not recognised. Fingerprinting misses covers, remixes and music under voice — listen to it.",
+  "acr_weak": "ACRCloud: weak match: {artists} – {title} [{label}], score {score}.",
+  "acr_cover": "ACRCloud: cover of a known song: {artists} – {title} [{label}].",
+  "acr_licensed": "ACRCloud: source you hold a licence for: {artists} – {title} [{label}].",
+  "acr_safe": "ACRCloud: safe source: {artists} – {title} [{label}].",
+  "acr_commercial": "ACRCloud: commercial label: {artists} – {title} [{label}], score {score}.",
+  "acr_stock": "ACRCloud: stock library, no licence on file: {artists} – {title} [{label}].",
+  "acr_independent": "ACRCloud: independent or unknown label: {artists} – {title} [{label}], score {score}.",
+  "no_music_detected": "No music detected.",
+  "no_audio_for_recognition": "No audio available for recognition. Meta status: {meta_status}.",
+  "manual_confirmed_risk": "Your review: risk confirmed.",
+  "manual_cleared": "Your review: checked, OK.",
+  "manual_no_music": "Your review: no music.",
+  "not_recognized_yet": "Audio is available but was not recognised yet (connect ACRCloud or press Analyse). Meta status: {meta_status}."
+ },
+ "legend_h": "What the risk means"
+}

@@ -6,10 +6,12 @@ services:
     environment:
       # Optional. If empty, the app generates a key into data/ on first start.
       APP_SECRET_KEY: ${APP_SECRET_KEY:-}
+      # DEMO=1 fills the page with invented posts to try the UI.
+      DEMO: ${DEMO:-}
     volumes:
       - ./data:/srv/data
       - ./config:/srv/config:ro
     ports:
-      # Local only. Put a reverse proxy with HTTPS in front for network access.
-      - "127.0.0.1:8000:8000"
+      # Local only. For access from other devices put a reverse proxy with HTTPS in front.
+      - "127.0.0.1:${PORT:-8000}:8000"
     restart: unless-stopped
