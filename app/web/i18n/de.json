@@ -226,5 +226,36 @@
   "Auf die E-Mail von Meta warten (Minuten bis ein Tag), ZIP herunterladen und hier unverändert hochladen."
  ],
  "last_import": "Letzter Import {at}: {files} Dateien, {matched} zugeordnet, {archived} im Archiv.",
- "never_imported": "Noch kein Export importiert."
+ "never_imported": "Noch kein Export importiert.",
+ "larger": "Größer",
+ "posts_h": "Ihre Reels",
+ "hero_title": "Musikprüfung von {n} Reels",
+ "mini": {
+  "high": [
+   "Hohes Risiko im Feed",
+   "Beiträge mit kommerziellem Label, Cover oder Meta-Treffer"
+  ],
+  "manual": [
+   "Manuell prüfen",
+   "Meta gab keine Datei, nichts erkannt oder schwacher Treffer"
+  ],
+  "recognised": [
+   "Von ACRCloud erkannt",
+   "Videos mit gefundenem Track"
+  ],
+  "meta": [
+   "Von Meta geprüft",
+   "Videos, deren Meta-Prüfung abgeschlossen ist"
+  ],
+  "archive": [
+   "Im Archiv",
+   "Beiträge, die den Feed verlassen haben"
+  ]
+ },
+ "of": "von",
+ "hero_meta_acr_on": "ACRCloud verbunden",
+ "hero_meta_acr_off": "ACRCloud nicht verbunden",
+ "hero_meta_meta": "Meta-Urheberrechtsprüfung: {state}",
+ "meta_on": "verfügbar",
+ "meta_off": "nicht verfügbar"
 }

@@ -1,49 +1,52 @@
 {% extends "base.html" %}
 {% block nav %}
-<a href="/export.csv">{{ t.export_csv }}</a>
-<a href="/setup">{{ t.settings }}</a>
-<form method="post" action="/logout" class="inline"><button class="link">{{ t.logout }}</button></form>
+<span class="pill" id="account-pill"><span class="av" id="avatar"></span><span id="handle">{{ t.title }}</span></span>
+<span class="pill" id="refresh-info"></span>
+<details class="menu">
+  <summary class="pill" aria-label="Menu">⋯</summary>
+  <div class="menu-pop">
+    <a href="/setup">{{ t.settings }}</a>
+    <a href="/export.csv">{{ t.export_csv }}</a>
+    <form method="post" action="/logout" class="inline"><button type="submit">{{ t.logout }}</button></form>
+  </div>
+</details>
 {% endblock %}
 {% block body %}
-<main id="app" data-lang="{{ lang }}">
-  <header class="profile">
-    <div class="avatar" id="avatar" aria-hidden="true"></div>
-    <div class="pinfo">
-      <h1 class="handle" id="handle">{{ t.title }}</h1>
-      <div class="stats" id="stats"></div>
-      <p class="muted">{{ t.tagline }}</p>
-    </div>
-  </header>
+<main id="app" data-lang="{{ lang }}" class="wrap">
+  <section class="hero">
+    <p class="meta" id="hero-meta"></p>
+    <h1 id="hero-title">{{ t.tagline }}</h1>
+    <div class="minis" id="minis"></div>
+  </section>
   <div class="notices" id="notices"></div>
   <div class="toolbar">
     <button class="btn" id="refresh">{{ t.refresh }}</button>
     <button class="btn ghost" id="analyze-all">{{ t.analyze_all }}</button>
     <label class="btn ghost file">{{ t.import }}<input type="file" id="import" accept=".zip" hidden></label>
-    <span class="muted" id="refresh-info"></span>
     <span class="muted" id="jobs"></span>
   </div>
   <p class="msg" id="msg" role="status" aria-live="polite"></p>
-  <div class="chips" id="chips" role="group" aria-label="{{ t.filter }}"></div>
-  <div>
-    <div class="tabs" role="tablist">
+
+  <section class="card" id="posts">
+    <div class="card-h"><span class="num">1</span><h2>{{ t.posts_h }}</h2>
+      <button class="help-btn" type="button" id="legend-toggle" aria-expanded="false" aria-controls="legend-box">?</button></div>
+    <div class="legend" id="legend-box" hidden><div id="legend" class="legend"></div></div>
+    <div class="seg" role="tablist">
       <button class="tab" role="tab" id="tab-feed" aria-selected="true">{{ t.tab_feed }}</button>
       <button class="tab" role="tab" id="tab-archive" aria-selected="false">{{ t.tab_archive }}</button>
     </div>
+    <div class="chips" id="chips" role="group" aria-label="{{ t.filter }}"></div>
     <section class="card archive-panel" id="archive-panel" hidden>
-      <h2>{{ t.archive_panel_h }}</h2>
+      <div class="card-h"><span class="num">i</span><h2>{{ t.archive_panel_h }}</h2></div>
       <p class="muted">{{ t.archive_panel_text }}</p>
       <ol class="help">{% for line in t.archive_panel_steps %}<li>{{ line }}</li>{% endfor %}</ol>
       <div class="row">
-        <label class="btn file">{{ t.import }}<input type="file" id="import-archive" accept=".zip" hidden></label>
+        <label class="btn accent file">{{ t.import }}<input type="file" id="import-archive" accept=".zip" hidden></label>
         <span class="muted" id="last-import"></span>
       </div>
     </section>
     <div class="grid" id="grid"></div>
     <p class="empty" id="empty" hidden>{{ t.empty }}</p>
-  </div>
-  <section class="notes">
-    <h2>{{ t.legend_h }}</h2>
-    <div class="legend" id="legend"></div>
   </section>
   <dialog id="dlg"></dialog>
 </main>

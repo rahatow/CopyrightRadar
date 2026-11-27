@@ -4,14 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ t.title }}</title>
+<link rel="preload" href="/static/fonts/onest-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/app.css">
+<script src="/static/base.js"></script>
 </head>
 <body>
 <div class="wrap">
   <nav class="top">
-    <a class="brand" href="/">{{ t.title }}</a>
-    <span class="spacer"></span>
+    <a class="brand" href="/"><span class="logo" aria-hidden="true"><i></i><i></i><i></i></span>{{ t.title }}</a>
     {% block nav %}{% endblock %}
+    <button class="pill" id="larger" type="button" aria-pressed="false">Aa {{ t.larger }}</button>
     <div class="lang" role="group" aria-label="Language">
       {% for l in langs %}<a href="?lang={{ l }}" aria-current="{{ 'true' if l == lang else 'false' }}" data-l="{{ l }}">{{ l|upper }}</a>{% endfor %}
     </div>

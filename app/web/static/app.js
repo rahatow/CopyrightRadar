@@ -47,10 +47,9 @@
   function render() {
     const acc = S.account || {};
     $("handle").textContent = acc.username ? "@" + acc.username : T.title;
-    $("avatar").textContent = (acc.username || "CR").slice(0, 2).toUpperCase();
+    $("avatar").textContent = (acc.username || "C").slice(0, 1).toUpperCase();
     const feed = S.media.filter((m) => !archived(m));
     const arch = S.media.filter(archived);
-    $("stats").innerHTML = T.stats.replace(/\{(\w+)\}/g, (_, k) => esc({ feed: feed.length, archive: arch.length, high: feed.filter((m) => m.level === "high").length }[k]));
     const notes = [];
     if (S.demo) notes.push(T.demo);
     if (!S.instagram_configured && !S.demo) notes.push(T.err.no_token);
@@ -58,6 +57,7 @@
     if (!S.acr_configured) notes.push(T.no_acr);
     $("notices").innerHTML = notes.map((n) => `<p class="notice">${esc(n)}</p>`).join("");
     $("refresh-info").textContent = S.last_refresh ? fill(T.last_check, { at: fmtDate(S.last_refresh.at, true) }) : T.never_checked;
+    renderHero(feed, arch);
     $("jobs").textContent = S.jobs && S.jobs.pending > 0 ? fill(T.jobs, S.jobs) : "";
 
     const tabList = tab === "archive" ? arch : feed;
@@ -96,6 +96,28 @@
     $("legend").innerHTML = ORDER.map((r) => `<div class="lv-${r}"><span class="dot"></span><span><b>${esc(L(r)[0])}.</b> ${esc(L(r)[1])}</span></div>`).join("");
   }
 
+  function renderHero(feed, arch) {
+    const vids = S.media.filter((m) => m.kind === "video");
+    const ofHtml = (a, b) => `${a} <span class="of">${esc(T.of)} ${b}</span>`;
+    const recognised = vids.filter((m) => m.acr.some((a) => a.status === "match")).length;
+    const metaDone = vids.filter((m) => m.meta.length && ["complete", "completed"].includes(m.meta[0].status)).length;
+    const manual = S.media.filter((m) => m.manual_check.length).length;
+    const minis = [
+      ["high", ofHtml(feed.filter((m) => m.level === "high").length, feed.length), () => { tab = "feed"; filter = "high"; manualOnly = false; }],
+      ["manual", ofHtml(manual, S.media.length), () => { manualOnly = true; filter = null; }],
+      ["recognised", ofHtml(recognised, vids.length), () => {}],
+      ["meta", ofHtml(metaDone, vids.length), () => {}],
+      ["archive", String(arch.length), () => { tab = "archive"; filter = null; manualOnly = false; }],
+    ];
+    $("minis").innerHTML = minis.map(([k, v], i) => `<button class="mini" data-k="${k}" type="button"><span class="q"><span class="num">${i + 1}</span>${esc(T.mini[k][0])}</span>` +
+      `<span class="big">${v}</span><span class="sub">${esc(T.mini[k][1])}</span></button>`).join("");
+    $("minis").querySelectorAll(".mini").forEach((b, i) => (b.onclick = () => { minis[i][2](); save(); render(); $("posts").scrollIntoView({ behavior: "smooth" }); }));
+    const acc = S.account || {};
+    $("hero-title").textContent = fill(T.hero_title, { n: vids.length });
+    $("hero-meta").innerHTML = [acc.username ? `<b>@${esc(acc.username)}</b>` : "", esc(S.acr_configured ? T.hero_meta_acr_on : T.hero_meta_acr_off),
+      esc(fill(T.hero_meta_meta, { state: S.copyright_supported ? T.meta_on : T.meta_off }))].filter(Boolean).map((x) => `<span>${x}</span>`).join("");
+  }
+
   function reasonText(r) {
     const tpl = T.reasons[r.k] || r.k;
     const v = { ...r };
@@ -124,7 +146,7 @@
     const markBtn = m.state === "in_feed" ? `<button class="btn ghost" id="d-mark">${esc(T.mark_on)}</button>`
       : m.state === "archived_manual" ? `<button class="btn ghost" id="d-unmark">${esc(T.mark_off)}</button>` : "";
     d.innerHTML = `<div class="sheet"><div class="pic">${pic}</div><div class="info">
-      <div class="head"><span class="pill lv-${esc(m.level)}"><span class="dot"></span>${esc(L(m.level)[0])}</span>
+      <div class="head"><span class="pillv lv-${esc(m.level)}"><span class="dot"></span>${esc(L(m.level)[0])}</span>
       <button class="close" id="d-close" aria-label="${esc(T.close)}">×</button></div>
       <p class="todo">${esc(T.todo[m.level] || "")}</p>
       ${m.manual_check.length ? `<div class="notice"><strong>${esc(T.manual_h)}</strong><ul>${m.manual_check.map((k) => `<li>${esc(T.manual[k] || k)}</li>`).join("")}</ul></div>` : ""}
@@ -161,6 +183,10 @@
     if (!d.open) d.showModal();
   }
 
+  $("legend-toggle").onclick = () => {
+    const box = $("legend-box"); box.hidden = !box.hidden;
+    $("legend-toggle").setAttribute("aria-expanded", String(!box.hidden));
+  };
   $("dlg").addEventListener("click", (e) => { if (e.target.id === "dlg") e.target.close(); });
   $("tab-feed").onclick = () => { tab = "feed"; filter = null; save(); render(); };
   $("tab-archive").onclick = () => { tab = "archive"; filter = null; save(); render(); };

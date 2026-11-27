@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block nav %}{% if s.has_password %}<a href="/">{{ t.go_main }}</a>{% endif %}{% endblock %}
+{% block nav %}{% if s.has_password %}<a class="pill" href="/">{{ t.go_main }}</a>{% endif %}{% endblock %}
 {% block body %}
 <main class="narrow" id="step">
-  <h1>{{ t.setup_title }}</h1>
-  <p class="muted">{{ t.setup_intro }}</p>
-  {% if msg and t.msg[msg] %}<p class="msg ok">{{ t.msg[msg] }}</p>{% endif %}
+  <section class="hero"><p class="meta"><b>{{ t.title }}</b><span>{{ t.tagline }}</span></p>
+    <h1>{{ t.setup_title }}</h1><p class="meta">{{ t.setup_intro }}</p></section>
+  {% if msg and t.msg[msg] %}<p class="notice">{{ t.msg[msg] }}</p>{% endif %}
   {% if err and t.err[err] %}<p class="msg err">{{ t.err[err] }}</p>{% endif %}
   {% if err_detail %}<p class="msg err"><small>Meta: {{ err_detail }}</small></p>{% endif %}
 
   <section class="card">
-    <h2>{{ t.step1 }} <span class="status {{ 'done' if s.has_password }}">{{ t.status_ok if s.has_password else t.status_todo }}</span></h2>
+    <div class="card-h"><span class="num">1</span><h2>{{ t.step1[3:] }}</h2><span class="status {{ 'done' if s.has_password }}">{{ t.status_ok if s.has_password else t.status_todo }}</span></div>
     <p class="muted">{{ t.step1_help }}</p>
     <form method="post" action="/setup/password" class="stack">
       <label>{{ t.password }}<input type="password" name="password" minlength="10" autocomplete="new-password" required></label>
@@ -20,9 +20,9 @@
 
   {% if s.has_password %}
   <section class="card">
-    <h2>{{ t.step2 }} <span class="status {{ 'done' if s.account }}">{{ ('@' ~ s.account.username) if s.account else t.status_todo }}</span></h2>
+    <div class="card-h"><span class="num">2</span><h2>{{ t.step2[3:] }}</h2><span class="status {{ 'done' if s.account }}">{{ ('@' ~ s.account.username) if s.account else t.status_todo }}</span></div>
     <ol class="help">{% for line in t.step2_help %}<li>{{ line }}</li>{% endfor %}</ol>
-    {% if s.account %}<p class="muted">{{ t.copyright_yes if s.copyright_supported else t.copyright_no }}</p>{% endif %}
+    {% if s.account %}<p class="notice">{{ t.copyright_yes if s.copyright_supported else t.copyright_no }}</p>{% endif %}
     <form method="post" action="/setup/instagram" class="stack">
       <label>{{ t.token }}<input type="password" name="token" autocomplete="off" required></label>
       <label>{{ t.ig_user_id }}<input name="ig_user_id" inputmode="numeric" autocomplete="off" placeholder="17841400000000000"></label>
@@ -31,7 +31,7 @@
   </section>
 
   <section class="card">
-    <h2>{{ t.step3 }} <span class="status {{ 'done' if s.acr_saved }}">{{ t.status_ok if s.acr_saved else t.status_todo }}</span></h2>
+    <div class="card-h"><span class="num">3</span><h2>{{ t.step3[3:] }}</h2><span class="status {{ 'done' if s.acr_saved }}">{{ t.status_ok if s.acr_saved else t.status_todo }}</span></div>
     <ol class="help">{% for line in t.step3_help %}<li>{{ line }}</li>{% endfor %}</ol>
     <form method="post" action="/setup/acrcloud" class="stack">
       <label>{{ t.host }}<input name="host" placeholder="identify-eu-west-1.acrcloud.com" required></label>
@@ -42,9 +42,9 @@
   </section>
 
   <section class="card">
-    <h2>{{ t.step4 }} <span class="status {{ 'done' if s.synced }}">{{ t.status_ok if s.synced else t.status_todo }}</span></h2>
+    <div class="card-h"><span class="num">4</span><h2>{{ t.step4[3:] }}</h2><span class="status {{ 'done' if s.synced }}">{{ t.status_ok if s.synced else t.status_todo }}</span></div>
     <ol class="help">{% for line in t.step4_help %}<li>{{ line }}</li>{% endfor %}</ol>
-    <a class="btn" href="/">{{ t.go_main }}</a>
+    <a class="btn accent" href="/">{{ t.go_main }}</a>
   </section>
   {% endif %}
 </main>

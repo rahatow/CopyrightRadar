@@ -226,5 +226,36 @@
   "Wait for Meta's e-mail (minutes to a day), download the ZIP and upload it here as it is."
  ],
  "last_import": "Last import {at}: {files} files, {matched} matched, {archived} in the archive.",
- "never_imported": "No export imported yet."
+ "never_imported": "No export imported yet.",
+ "larger": "Larger",
+ "posts_h": "Your Reels",
+ "hero_title": "Music check of {n} Reels",
+ "mini": {
+  "high": [
+   "High risk in feed",
+   "posts with a commercial label, a cover or a Meta match"
+  ],
+  "manual": [
+   "Check by hand",
+   "Meta gave no file, nothing recognised, or a weak match"
+  ],
+  "recognised": [
+   "Recognised by ACRCloud",
+   "videos with a track found"
+  ],
+  "meta": [
+   "Checked by Meta",
+   "videos Meta has finished checking"
+  ],
+  "archive": [
+   "In the archive",
+   "posts that left the feed"
+  ]
+ },
+ "of": "of",
+ "hero_meta_acr_on": "ACRCloud connected",
+ "hero_meta_acr_off": "ACRCloud not connected",
+ "hero_meta_meta": "Meta copyright check: {state}",
+ "meta_on": "available",
+ "meta_off": "not available"
 }

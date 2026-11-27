@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block body %}
 <main class="narrow">
-  <h1>{{ t.login_title }}</h1>
-  {% if error %}<p class="msg err">{{ t.login_error }}</p>{% endif %}
-  <form method="post" action="/login" class="stack">
-    <label>{{ t.password }}<input type="password" name="password" autocomplete="current-password" required autofocus></label>
-    <button class="btn">{{ t.login_btn }}</button>
-  </form>
+  <section class="hero"><p class="meta"><b>{{ t.title }}</b><span>{{ t.tagline }}</span></p><h1>{{ t.login_title }}</h1></section>
+  <section class="card">
+    {% if error %}<p class="msg err">{{ t.login_error }}</p>{% endif %}
+    <form method="post" action="/login" class="stack">
+      <label>{{ t.password }}<input type="password" name="password" autocomplete="current-password" required autofocus></label>
+      <button class="btn">{{ t.login_btn }}</button>
+    </form>
+  </section>
 </main>
 {% endblock %}

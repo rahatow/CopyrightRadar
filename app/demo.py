@@ -66,4 +66,5 @@ def seed(svc) -> None:
             db.x("INSERT OR IGNORE INTO manual_review(media_id,verdict,note,reviewed_at) VALUES(?,?,?,?)", (mid, review, "", ts))
         svc.reassess(mid)
     db.set("account", {"username": "demo_studio", "user_id": "0", "account_type": "BUSINESS"})
+    db.set("meta_copyright_supported", True)
     db.set("demo_seeded", True)
