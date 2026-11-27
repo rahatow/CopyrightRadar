@@ -43,6 +43,8 @@ Optional: set `APP_SECRET_KEY` (see `.env.example`); otherwise the app creates a
 
 **Access from other devices:** the container listens on 127.0.0.1 only. Put a reverse proxy with HTTPS in front (Caddy, nginx, Traefik) and keep the app's password login on.
 
+**Forgot the page password?** `docker compose exec app python -m app.reset_password`, then open the page and set a new one. Tokens and data stay.
+
 **Your data** stays in `./data`: the SQLite database, encrypted tokens, previews, downloaded and imported media. Back it up; delete it to remove everything.
 
 ## Run the tests
