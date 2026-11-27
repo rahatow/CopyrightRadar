@@ -255,6 +255,7 @@ class Service:
                     self.db.set(f"export_photo:{mid}", str(it.local_path))
             self.enqueue("analyze", mid)
         self.db.audit("import_export", counts)
+        self.db.set("last_import", {**counts, "at": ts})
         return counts
 
     def reconcile_export(self) -> dict:

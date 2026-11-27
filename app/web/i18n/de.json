@@ -217,5 +217,14 @@
   "not_recognized": "ACRCloud hat nichts erkannt. Fingerprinting übersieht Cover, Remixe und Musik unter Sprache: anhören und Ihre Prüfung setzen.",
   "recognition_error": "Erkennung eines Ausschnitts fehlgeschlagen. „Neu analysieren“ klicken.",
   "weak_match": "Schwacher Treffer (Score unter 70). Anhören und Ihre Prüfung setzen."
- }
+ },
+ "archive_panel_h": "Archivierte und gelöschte Beiträge: Instagram-Export importieren",
+ "archive_panel_text": "Die Instagram-API zeigt archivierte Beiträge nicht und liefert keine Dateien von Videos mit geschützter Musik. Ihr Instagram-Export enthält beides. Nach dem Import ordnet CopyrightRadar die Dateien Ihren Beiträgen zu und prüft den Ton in einem zweiten Durchgang mit ACRCloud.",
+ "archive_panel_steps": [
+  "Instagram: Einstellungen → Kontenübersicht → Deine Informationen und Berechtigungen → Deine Informationen exportieren → Auf Gerät exportieren.",
+  "Instagram-Konto wählen, Format: JSON, Medienqualität: mittel oder höher, Zeitraum: gesamter Zeitraum.",
+  "Auf die E-Mail von Meta warten (Minuten bis ein Tag), ZIP herunterladen und hier unverändert hochladen."
+ ],
+ "last_import": "Letzter Import {at}: {files} Dateien, {matched} zugeordnet, {archived} im Archiv.",
+ "never_imported": "Noch kein Export importiert."
 }

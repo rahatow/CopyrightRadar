@@ -231,6 +231,7 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
             "acr_configured": bool(svc.secrets.get("acrcloud")),
             "instagram_configured": bool(svc.secrets.get("instagram_token")),
             "jobs": {k: v for k, v in svc.job_state.items()},
+            "last_import": svc.db.get("last_import"),
             "demo": settings.demo,
             "media": items,
         }

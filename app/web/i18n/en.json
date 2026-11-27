@@ -217,5 +217,14 @@
   "not_recognized": "ACRCloud found no match. Fingerprinting misses covers, remixes and music under voice: listen and set your review.",
   "recognition_error": "Recognition failed for a fragment. Press “Analyse again”.",
   "weak_match": "Weak match (score below 70). Listen and set your review."
- }
+ },
+ "archive_panel_h": "Archived and deleted posts: import your Instagram export",
+ "archive_panel_text": "The Instagram API does not show archived posts and does not give files of videos with copyrighted music. Your Instagram export contains both. After the import CopyrightRadar matches the files to your posts and checks their audio with ACRCloud in a second pass.",
+ "archive_panel_steps": [
+  "Instagram: Settings → Accounts Center → Your information and permissions → Export your information → Export to device.",
+  "Choose your Instagram account, Format: JSON, media quality: medium or higher, date range: all time.",
+  "Wait for Meta's e-mail (minutes to a day), download the ZIP and upload it here as it is."
+ ],
+ "last_import": "Last import {at}: {files} files, {matched} matched, {archived} in the archive.",
+ "never_imported": "No export imported yet."
 }

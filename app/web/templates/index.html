@@ -29,6 +29,15 @@
       <button class="tab" role="tab" id="tab-feed" aria-selected="true">{{ t.tab_feed }}</button>
       <button class="tab" role="tab" id="tab-archive" aria-selected="false">{{ t.tab_archive }}</button>
     </div>
+    <section class="card archive-panel" id="archive-panel" hidden>
+      <h2>{{ t.archive_panel_h }}</h2>
+      <p class="muted">{{ t.archive_panel_text }}</p>
+      <ol class="help">{% for line in t.archive_panel_steps %}<li>{{ line }}</li>{% endfor %}</ol>
+      <div class="row">
+        <label class="btn file">{{ t.import }}<input type="file" id="import-archive" accept=".zip" hidden></label>
+        <span class="muted" id="last-import"></span>
+      </div>
+    </section>
     <div class="grid" id="grid"></div>
     <p class="empty" id="empty" hidden>{{ t.empty }}</p>
   </div>

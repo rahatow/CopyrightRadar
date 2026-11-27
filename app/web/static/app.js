@@ -89,6 +89,8 @@
     }).join("");
     $("empty").hidden = shown.length > 0;
     $("grid").querySelectorAll(".tile").forEach((t) => (t.onclick = () => open(S.media.find((m) => m.id === t.dataset.id))));
+    $("archive-panel").hidden = tab !== "archive";
+    $("last-import").textContent = S.last_import ? fill(T.last_import, { at: fmtDate(S.last_import.at, true), ...S.last_import }) : T.never_imported;
     $("tab-feed").setAttribute("aria-selected", tab === "feed");
     $("tab-archive").setAttribute("aria-selected", tab === "archive");
     $("legend").innerHTML = ORDER.map((r) => `<div class="lv-${r}"><span class="dot"></span><span><b>${esc(L(r)[0])}.</b> ${esc(L(r)[1])}</span></div>`).join("");
@@ -180,14 +182,16 @@
     say(r.ok ? fill(T.jobs, { pending: r.body.queued }) : esc(errText(r.body)), !r.ok);
     poll();
   };
-  $("import").onchange = async () => {
-    const inp = $("import"); if (!inp.files[0]) return;
+  const importZip = async (inp) => {
+    if (!inp.files[0]) return;
     say(esc(T.importing));
     const f = new FormData(); f.append("file", inp.files[0]);
     const r = await api("/api/import", f, true);
     inp.value = "";
     if (r.ok) { await load(); say(fill(T.import_done, r.body)); poll(); } else say(esc(errText(r.body)), true);
   };
+  $("import").onchange = () => importZip($("import"));
+  $("import-archive").onchange = () => importZip($("import-archive"));
 
   let polling = false;
   async function poll() {
