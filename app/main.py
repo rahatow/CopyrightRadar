@@ -55,9 +55,13 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
         c = request.cookies.get("lang")
         return c if c in LANGS else "de"
 
+    # Cache-busting: static URLs carry a hash of the files, so browsers never mix old CSS with new HTML.
+    import hashlib
+    asset_v = hashlib.sha1(b"".join((WEB / "static" / f).read_bytes() for f in ("app.css", "app.js", "base.js"))).hexdigest()[:10]
+
     def page(request: Request, name: str, **ctx) -> HTMLResponse:
         lang = lang_of(request)
-        resp = templates.TemplateResponse(request, name, {"t": texts[lang], "lang": lang, "langs": LANGS, **ctx})
+        resp = templates.TemplateResponse(request, name, {"t": texts[lang], "lang": lang, "langs": LANGS, "v": asset_v, **ctx})
         if request.query_params.get("lang") in LANGS:
             resp.set_cookie("lang", lang, max_age=365 * 86400, samesite="strict")
         return resp
@@ -83,6 +87,8 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
     @app.middleware("http")
     async def _headers(request: Request, call_next):
         resp = await call_next(request)
+        if request.url.path.startswith("/static/") and "v" not in request.query_params:
+            resp.headers["Cache-Control"] = "no-cache"
         resp.headers["X-Frame-Options"] = "DENY"
         resp.headers["X-Content-Type-Options"] = "nosniff"
         resp.headers["Referrer-Policy"] = "same-origin"
