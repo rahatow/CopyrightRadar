@@ -93,3 +93,5 @@ footer.disclaimer{border-top:1px solid var(--line);padding-top:12px;color:var(--
   .tabs{gap:24px}.badge{font-size:10px;padding:2px 6px;left:4px;top:4px}.flags{right:4px;bottom:4px}.tile .date{display:none}
   .avatar{width:56px;height:56px;font-size:16px}
 }
+.chip.manual{border-style:dashed}
+.notice ul{margin:4px 0 0;padding-left:18px}

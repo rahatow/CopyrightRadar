@@ -314,6 +314,7 @@ class Service:
             src = self.db.one("SELECT kind, duration_s, has_audio_stream FROM audio_source WHERE media_id=?", (mid,))
             review = self.db.one("SELECT verdict, note, reviewed_at FROM manual_review WHERE media_id=?", (mid,))
             out.append({
+                "manual_check": manual_check_reasons(r["kind"], src, recs, review, r["media_url"], r["in_api"]),
                 "id": mid, "shortcode": r["shortcode"], "permalink": r["permalink"], "kind": r["kind"],
                 "product": r["media_product_type"], "timestamp": r["timestamp"], "caption": r["caption_excerpt"],
                 "in_api": bool(r["in_api"]), "state": r["state"] or "in_feed", "since": r["since"],
@@ -328,6 +329,33 @@ class Service:
                 "review": dict(review) if review else None,
             })
         return out
+
+
+def manual_check_reasons(kind, src, recs, review, media_url, in_api) -> list[str]:
+    """Why a person should check this post by hand. Empty list = nothing to do.
+
+    No new risk level is invented here: the automatic level stays as it is, the post is only
+    put on the manual-check list (SPEC 9, «Проверить вручную»).
+    """
+    if review or kind != "video":
+        return []
+    out = []
+    if src is None:
+        # Meta omits media_url for videos with copyrighted or licensed audio (Meta docs).
+        out.append("no_file_meta" if in_api and not media_url else "no_file")
+        return out
+    if not src["has_audio_stream"]:
+        return []
+    statuses = [r["status"] for r in recs]
+    if not statuses:
+        out.append("not_recognized_yet")
+    elif all(s == "no_match" for s in statuses):
+        out.append("not_recognized")
+    elif any(s == "error" for s in statuses):
+        out.append("recognition_error")
+    if any(r["status"] == "match" and r["score"] is not None and r["score"] < 70 for r in recs):
+        out.append("weak_match")
+    return out
 
 
 def _safe(media_id: str) -> str:

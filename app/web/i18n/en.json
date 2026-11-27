@@ -132,7 +132,8 @@
   "photo": "Photo",
   "export": "Export",
   "missing": "Not in feed",
-  "manual": "Archived"
+  "manual": "Archived",
+  "check": "Check"
  },
  "rows": {
   "why": "Why",
@@ -206,5 +207,15 @@
   "not_recognized_yet": "Audio is available but was not recognised yet (connect ACRCloud or press Analyse). Meta status: {meta_status}."
  },
  "legend_h": "What the risk means",
- "ig_user_id": "Instagram account ID (only for tokens from the new Meta setup, shown next to the account in the app dashboard)"
+ "ig_user_id": "Instagram account ID (only for tokens from the new Meta setup, shown next to the account in the app dashboard)",
+ "manual_chip": "Check by hand",
+ "manual_h": "Check by hand",
+ "manual": {
+  "no_file_meta": "Meta does not give the video file. Meta does this for videos with copyrighted or licensed music. Import your Instagram export (ZIP) or upload the video: ACRCloud then checks it in a second pass. Or listen and set your review.",
+  "no_file": "No audio file. Import your Instagram export or upload the video.",
+  "not_recognized_yet": "Audio is there but not recognised yet. Press “Analyse again”.",
+  "not_recognized": "ACRCloud found no match. Fingerprinting misses covers, remixes and music under voice: listen and set your review.",
+  "recognition_error": "Recognition failed for a fragment. Press “Analyse again”.",
+  "weak_match": "Weak match (score below 70). Listen and set your review."
+ }
 }

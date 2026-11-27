@@ -132,7 +132,8 @@
   "photo": "Foto",
   "export": "Export",
   "missing": "Nicht im Feed",
-  "manual": "Archiviert"
+  "manual": "Archiviert",
+  "check": "Prüfen"
  },
  "rows": {
   "why": "Warum",
@@ -206,5 +207,15 @@
   "not_recognized_yet": "Ton ist vorhanden, wurde aber noch nicht erkannt (ACRCloud verbinden oder „Neu analysieren“). Meta-Status: {meta_status}."
  },
  "legend_h": "Was das Risiko bedeutet",
- "ig_user_id": "Instagram-Konto-ID (nur für Tokens aus der neuen Meta-Einrichtung; steht neben dem Konto im App-Dashboard)"
+ "ig_user_id": "Instagram-Konto-ID (nur für Tokens aus der neuen Meta-Einrichtung; steht neben dem Konto im App-Dashboard)",
+ "manual_chip": "Manuell prüfen",
+ "manual_h": "Manuell prüfen",
+ "manual": {
+  "no_file_meta": "Meta liefert die Videodatei nicht. Das tut Meta bei Videos mit urheberrechtlich geschützter oder lizenzierter Musik. Importieren Sie Ihren Instagram-Export (ZIP) oder laden Sie das Video hoch: ACRCloud prüft es dann in einem zweiten Durchgang. Oder anhören und Ihre Prüfung setzen.",
+  "no_file": "Keine Tondatei. Instagram-Export importieren oder Video hochladen.",
+  "not_recognized_yet": "Ton vorhanden, aber noch nicht erkannt. „Neu analysieren“ klicken.",
+  "not_recognized": "ACRCloud hat nichts erkannt. Fingerprinting übersieht Cover, Remixe und Musik unter Sprache: anhören und Ihre Prüfung setzen.",
+  "recognition_error": "Erkennung eines Ausschnitts fehlgeschlagen. „Neu analysieren“ klicken.",
+  "weak_match": "Schwacher Treffer (Score unter 70). Anhören und Ihre Prüfung setzen."
+ }
 }

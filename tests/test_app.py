@@ -172,3 +172,15 @@ def test_export_before_sync_then_merge_after_sync(env, tmp_path):
     media = client.get("/api/state").json()["media"]
     export_left = [m for m in media if m["id"].startswith("export:")]
     assert len(export_left) == 1 and export_left[0]["state"] == "missing"
+
+
+def test_manual_check_list(env):
+    """Videos Meta does not give a file for go to the manual-check list; the level is not raised."""
+    client, svc, meta = env
+    setup_all(client)
+    client.post("/api/refresh", json={}, headers=ORIGIN)  # fake API gives no media_url
+    media = {m["id"]: m for m in client.get("/api/state").json()["media"]}
+    assert media["1001"]["manual_check"] == ["no_file_meta"]
+    assert media["1001"]["level"] == "unknown"
+    client.post("/api/review", json={"id": "1001", "verdict": "cleared"}, headers=ORIGIN)
+    assert {m["id"]: m for m in client.get("/api/state").json()["media"]}["1001"]["manual_check"] == []

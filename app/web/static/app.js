@@ -16,7 +16,7 @@
         : { day: "2-digit", month: "2-digit", year: "numeric" });
     } catch (e) { return iso; }
   };
-  let T = {}, S = null, tab = "feed", filter = null;
+  let T = {}, S = null, tab = "feed", filter = null, manualOnly = false;
   try { const v = localStorage.getItem("cr-tab"); if (v === "archive") tab = v; } catch (e) {}
 
   const archived = (m) => m.state !== "in_feed";
@@ -60,13 +60,18 @@
     $("refresh-info").textContent = S.last_refresh ? fill(T.last_check, { at: fmtDate(S.last_refresh.at, true) }) : T.never_checked;
     $("jobs").textContent = S.jobs && S.jobs.pending > 0 ? fill(T.jobs, S.jobs) : "";
 
-    const list = tab === "archive" ? arch : feed;
+    const tabList = tab === "archive" ? arch : feed;
+    const manualCount = tabList.filter((m) => m.manual_check.length).length;
+    if (!manualCount) manualOnly = false;
+    const list = manualOnly ? tabList.filter((m) => m.manual_check.length) : tabList;
     const counts = {}; list.forEach((m) => (counts[m.level] = (counts[m.level] || 0) + 1));
     if (filter && !counts[filter]) filter = null;
     $("chips").innerHTML = `<button class="chip" data-r="" aria-pressed="${!filter}">${esc(T.all)} <b>${list.length}</b></button>` +
       ORDER.filter((r) => counts[r]).map((r) =>
         `<button class="chip lv-${r}" data-r="${r}" aria-pressed="${filter === r}"><span class="dot"></span>${esc(L(r)[0])} <b>${counts[r]}</b></button>`).join("");
-    $("chips").querySelectorAll(".chip").forEach((b) => (b.onclick = () => { filter = b.dataset.r || null; render(); }));
+    if (manualCount) $("chips").innerHTML += `<button class="chip manual" id="chip-manual" aria-pressed="${manualOnly}">${esc(T.manual_chip)} <b>${manualCount}</b></button>`;
+    $("chips").querySelectorAll(".chip[data-r]").forEach((b) => (b.onclick = () => { filter = b.dataset.r || null; render(); }));
+    const mc = $("chip-manual"); if (mc) mc.onclick = () => { manualOnly = !manualOnly; render(); };
 
     const shown = list.filter((m) => !filter || m.level === filter);
     $("grid").innerHTML = shown.map((m) => {
@@ -76,6 +81,7 @@
         !m.in_api ? T.flag.export : "",
         m.state === "missing" ? T.flag.missing : "",
         m.state === "archived_manual" ? T.flag.manual : "",
+        m.manual_check.length ? T.flag.check : "",
       ].filter(Boolean).map((f) => `<span class="flag">${esc(f)}</span>`).join("");
       return `<button class="tile" data-id="${esc(m.id)}" aria-label="${esc(fmtDate(m.timestamp) + ", " + L(m.level)[0])}">${img}` +
         `<span class="badge lv-${esc(m.level)}"><span class="dot"></span>${esc(L(m.level)[0])}</span><span class="flags">${flags}</span>` +
@@ -119,6 +125,7 @@
       <div class="head"><span class="pill lv-${esc(m.level)}"><span class="dot"></span>${esc(L(m.level)[0])}</span>
       <button class="close" id="d-close" aria-label="${esc(T.close)}">×</button></div>
       <p class="todo">${esc(T.todo[m.level] || "")}</p>
+      ${m.manual_check.length ? `<div class="notice"><strong>${esc(T.manual_h)}</strong><ul>${m.manual_check.map((k) => `<li>${esc(T.manual[k] || k)}</li>`).join("")}</ul></div>` : ""}
       <dl>
         ${row(R.why, "<ul>" + m.reasons.map((r) => `<li>${reasonText(r)}</li>`).join("") + "</ul>")}
         ${row(R.date, esc(fmtDate(m.timestamp, true)))}
