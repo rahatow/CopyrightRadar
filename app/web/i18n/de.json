@@ -17,11 +17,11 @@
  "step1_help": "Mindestens 10 Zeichen. Nur wer das Passwort kennt, sieht die Seite.",
  "step2": "2. Instagram (Ihre eigene Meta-App)",
  "step2_help": [
-  "Ihr Instagram-Konto muss ein professionelles Konto sein (Business oder Creator).",
-  "Öffnen Sie developers.facebook.com, erstellen Sie eine App und fügen Sie das Produkt Instagram mit Instagram-Login hinzu.",
-  "Nötige Berechtigung: nur instagram_business_basic. Für das eigene Konto reicht Standard Access, keine App-Prüfung.",
-  "Ist die App im Entwicklungsmodus, fügen Sie Ihr Instagram-Konto als Instagram-Tester hinzu und nehmen Sie die Einladung in Instagram an.",
-  "Erzeugen Sie im App-Dashboard einen Access Token für Ihr Konto und fügen Sie ihn hier ein. Er gilt 60 Tage; der Dienst verlängert ihn."
+  "Ihr Instagram-Konto muss ein professionelles Konto sein (Creator oder Business).",
+  "Erstellen Sie auf developers.facebook.com eine App mit dem Anwendungsfall „Manage messaging & content on Instagram“ (Facebook-Konto und kostenloses Business-Portfolio nötig).",
+  "Öffnen Sie „API setup with Unified login“ (neue Apps erhalten kein „Instagram login“ mehr) und erstellen Sie eine Login-Konfiguration aus der Vorlage.",
+  "Fügen Sie Ihr Instagram-Konto als Instagram-Tester hinzu (App roles → Roles) und nehmen Sie die Einladung in Instagram an (Einstellungen → Apps und Websites → Tester-Einladungen).",
+  "Klicken Sie neben Ihrem Konto auf „Generate token“, erlauben Sie den Zugriff im Fenster und fügen Sie Token und Instagram-Konto-ID hier ein. Anleitung mit Screenshots: docs/SETUP.md."
  ],
  "token": "Access Token",
  "save_check": "Speichern und prüfen",
@@ -205,5 +205,6 @@
   "manual_no_music": "Ihre Prüfung: keine Musik.",
   "not_recognized_yet": "Ton ist vorhanden, wurde aber noch nicht erkannt (ACRCloud verbinden oder „Neu analysieren“). Meta-Status: {meta_status}."
  },
- "legend_h": "Was das Risiko bedeutet"
+ "legend_h": "Was das Risiko bedeutet",
+ "ig_user_id": "Instagram-Konto-ID (nur für Tokens aus der neuen Meta-Einrichtung; steht neben dem Konto im App-Dashboard)"
 }

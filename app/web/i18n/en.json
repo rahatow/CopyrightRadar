@@ -17,11 +17,11 @@
  "step1_help": "At least 10 characters. Only people with this password see the page.",
  "step2": "2. Instagram (your own Meta app)",
  "step2_help": [
-  "Your Instagram account must be a professional account (Business or Creator).",
-  "Open developers.facebook.com, create an app and add the Instagram product with Instagram login.",
-  "Permission needed: instagram_business_basic only. For your own account Standard Access is enough; no App Review.",
-  "If the app is in development mode, add your Instagram account as an Instagram Tester and accept the invite in Instagram.",
-  "Generate an access token for your account in the app dashboard and paste it here. It is valid for 60 days; the service renews it."
+  "Your Instagram account must be a professional account (Creator or Business).",
+  "On developers.facebook.com create an app with the use case “Manage messaging & content on Instagram” (needs a Facebook account and a free business portfolio).",
+  "Open “API setup with Unified login” (new apps no longer get “Instagram login”), create a login configuration from the template.",
+  "Add your Instagram account as Instagram Tester (App roles → Roles) and accept the invite in Instagram (Settings → Apps and websites → Tester invites).",
+  "Click “Generate token” next to your account, allow access in the window, paste the token and the Instagram account ID here. Step-by-step guide with screenshots: docs/SETUP.md."
  ],
  "token": "Access token",
  "save_check": "Save and check",
@@ -205,5 +205,6 @@
   "manual_no_music": "Your review: no music.",
   "not_recognized_yet": "Audio is available but was not recognised yet (connect ACRCloud or press Analyse). Meta status: {meta_status}."
  },
- "legend_h": "What the risk means"
+ "legend_h": "What the risk means",
+ "ig_user_id": "Instagram account ID (only for tokens from the new Meta setup, shown next to the account in the app dashboard)"
 }

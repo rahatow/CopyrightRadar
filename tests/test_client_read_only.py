@@ -48,3 +48,31 @@ def test_error_text_is_redacted():
     with pytest.raises(MetaError) as e:
         InstagramClient(TOKEN, pause_s=0, transport=httpx.MockTransport(handler)).me()
     assert TOKEN not in str(e.value) and e.value.code == 190
+
+
+def test_facebook_token_uses_graph_facebook_and_ig_user_id():
+    urls = []
+
+    def handler(req):
+        urls.append(req.url)
+        if req.url.path.endswith("/1784/media"):
+            return httpx.Response(200, json={"data": [{"id": "9", "permalink": "p"}]})
+        return httpx.Response(200, json={"id": "1784", "username": "test"})
+
+    c = InstagramClient("EAAFAKE", pause_s=0, transport=httpx.MockTransport(handler), ig_user_id="1784")
+    assert c.host == "graph.facebook.com"
+    assert c.me()["username"] == "test"
+    page = c.list_media(with_copyright=True)
+    assert page.complete and page.items[0]["id"] == "9"
+    assert all(u.host == "graph.facebook.com" for u in urls)
+    assert c.refresh_token() is None
+
+
+def test_facebook_token_discovers_single_ig_account():
+    def handler(req):
+        if req.url.path.endswith("/me/accounts"):
+            return httpx.Response(200, json={"data": [{"instagram_business_account": {"id": "555", "username": "s"}}, {}]})
+        return httpx.Response(200, json={"id": "555", "username": "s"})
+
+    c = InstagramClient("EAAFAKE", pause_s=0, transport=httpx.MockTransport(handler))
+    assert c.me()["user_id"] == "555" and c.ig_user_id == "555"

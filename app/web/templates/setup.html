@@ -6,6 +6,7 @@
   <p class="muted">{{ t.setup_intro }}</p>
   {% if msg and t.msg[msg] %}<p class="msg ok">{{ t.msg[msg] }}</p>{% endif %}
   {% if err and t.err[err] %}<p class="msg err">{{ t.err[err] }}</p>{% endif %}
+  {% if err_detail %}<p class="msg err"><small>Meta: {{ err_detail }}</small></p>{% endif %}
 
   <section class="card">
     <h2>{{ t.step1 }} <span class="status {{ 'done' if s.has_password }}">{{ t.status_ok if s.has_password else t.status_todo }}</span></h2>
@@ -24,6 +25,7 @@
     {% if s.account %}<p class="muted">{{ t.copyright_yes if s.copyright_supported else t.copyright_no }}</p>{% endif %}
     <form method="post" action="/setup/instagram" class="stack">
       <label>{{ t.token }}<input type="password" name="token" autocomplete="off" required></label>
+      <label>{{ t.ig_user_id }}<input name="ig_user_id" inputmode="numeric" autocomplete="off" placeholder="17841400000000000"></label>
       <button class="btn">{{ t.save_check }}</button>
     </form>
   </section>

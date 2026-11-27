@@ -36,7 +36,7 @@ def env(tmp_path, monkeypatch):
     monkeypatch.delenv("APP_SECRET_KEY", raising=False)
     meta = FakeMeta()
     settings = Settings(data_dir=tmp_path, rules_path=ROOT / "config" / "risk_rules.example.toml", refresh_cooldown_s=0)
-    svc = Service(settings, ig_factory=lambda tok: InstagramClient(tok, pause_s=0, transport=httpx.MockTransport(meta.handler)),
+    svc = Service(settings, ig_factory=lambda tok, ig_user_id=None: InstagramClient(tok, pause_s=0, transport=httpx.MockTransport(meta.handler)),
                   start_worker=False)
     client = TestClient(create_app(settings, svc))
     return client, svc, meta

@@ -37,7 +37,8 @@ class Service:
         self.db = DB(self.data / "copyright-radar.db")
         self.secrets = SecretStore(self.db, load_master_key(self.data))
         self.rules = RiskRules.load(settings.rules_path)
-        self._ig_factory = ig_factory or (lambda token: InstagramClient(token, pause_s=settings.meta_pause_s))
+        self._ig_factory = ig_factory or (lambda token, ig_user_id=None: InstagramClient(
+            token, pause_s=settings.meta_pause_s, ig_user_id=ig_user_id))
         self._acr_factory = acr_factory or (lambda cfg: ACRCloud(cfg["host"], cfg["key"], cfg["secret"]))
         self.jobs: queue.Queue = queue.Queue()
         self.job_state = {"pending": 0, "current": None, "done": 0, "errors": []}
@@ -47,7 +48,10 @@ class Service:
     # ---------- configuration ----------
     def ig(self) -> InstagramClient | None:
         token = self.secrets.get("instagram_token")
-        return self._ig_factory(token) if token else None
+        if not token:
+            return None
+        account = self.db.get("account") or {}
+        return self._ig_factory(token, ig_user_id=account.get("user_id"))
 
     def acr(self):
         raw = self.secrets.get("acrcloud")

@@ -6,11 +6,11 @@ Self-hosted tool for a studio, salon, clinic or any small business: check the mu
 
 > **Not legal advice.** The tool shows risk indicators from Meta's copyright check and from audio recognition (ACRCloud). Whether to remove a post, and how to answer a claim, is a decision for you and your lawyer.
 
-Status: **v0.1, early.** Tested with automated tests and a demo; not yet run against a real Meta app or a real ACRCloud key. The spec is in [docs/SPEC.md](docs/SPEC.md) (Russian for now). License: [AGPL-3.0](LICENSE).
+Status: **v0.1, early.** Tested with automated tests, a demo and, on 27.11.2026, a real test Instagram account, Meta app and ACRCloud key (see [docs/SETUP.md](docs/SETUP.md)). The spec is in [docs/SPEC.md](docs/SPEC.md) (Russian for now). License: [AGPL-3.0](LICENSE).
 
 ## What it does
 
-- **Reads** your posts and Meta's `copyright_check_information` through the Instagram API with Instagram Login. Read-only: GET requests only; nothing is posted, archived or deleted.
+- **Reads** your posts and Meta's `copyright_check_information` through the Instagram API (tokens from Meta's new "Unified login" via graph.facebook.com, or older Instagram Login tokens via graph.instagram.com). Read-only: GET requests only; nothing is posted, archived or deleted.
 - **Imports your Instagram data export** (ZIP, JSON format). Meta does not let apps download videos with copyrighted music, so the export is the only way to analyse exactly the riskiest Reels. It also shows posts that are already in the Instagram archive. Works even without a Meta app.
 - **Recognises the music** with **your own** ACRCloud key: up to three 15-second fragments per video (start, middle, end).
 - **Rates each post**: high, medium, unknown, low, no music, no sound — with reasons. The rules are a config file. Meta's "no match" never lowers a risk level.
@@ -31,7 +31,7 @@ git clone <repo-url> copyright-radar && cd copyright-radar
 docker compose up -d --build
 ```
 
-Open http://127.0.0.1:8000 and follow the setup: password → Instagram token → ACRCloud key → Refresh → (optional) import your export.
+Open http://127.0.0.1:8000 and follow the setup: password → Instagram token → ACRCloud key → Refresh → (optional) import your export. **Step-by-step guide with screenshots: [docs/SETUP.md](docs/SETUP.md).**
 
 Try it without any accounts first (invented posts):
 
@@ -81,12 +81,7 @@ tests/         pytest (no network: fake Meta and ACRCloud)
 
 ## Not verified yet
 
-- Whether Meta returns `copyright_check_information` through Instagram Login (the app probes it at setup and works without it).
+- Commercial tracks and Facebook Sound Collection tracks on a real account (needs Reels made in the Instagram mobile app).
+- Archive detection on a real account (archiving is only possible in the mobile app).
 - The export parser was written against the known JSON layout and synthetic files; check it with a fresh real export.
-- Meta rate-limit error codes; ACRCloud with a real key.
-
-## License
-
-Copyright (C) 2026 CopyrightRadar contributors.
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3 only (AGPL-3.0-only). If you run a modified version as a network service, you must offer its source code to the users of that service. See [LICENSE](LICENSE).
+- Meta rate-limit error codes.

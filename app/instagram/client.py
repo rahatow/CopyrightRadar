@@ -18,7 +18,8 @@ import httpx
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-HOST = "graph.instagram.com"
+HOST = "graph.instagram.com"          # tokens from Instagram Login (start with "IG")
+FB_HOST = "graph.facebook.com"        # tokens from Facebook / Unified Login (system-user tokens)
 BASE_URL = f"https://{HOST}"
 API_VERSION = "v23.0"
 MEDIA_FIELDS = "id,permalink,shortcode,media_type,media_product_type,timestamp,thumbnail_url,media_url,caption"
@@ -50,10 +51,31 @@ class MediaPage:
 
 
 class InstagramClient:
-    def __init__(self, token: str, pause_s: float = 0.8, transport: httpx.BaseTransport | None = None):
+    """Two token kinds (SPEC 6, 11):
+
+    - Instagram Login token ("IG..."): graph.instagram.com, the account is "me".
+    - Facebook / Unified Login token (new apps get only this since 2026): graph.facebook.com,
+      the account is the Instagram user id (`ig_user_id`).
+    """
+
+    def __init__(self, token: str, pause_s: float = 0.8, transport: httpx.BaseTransport | None = None,
+                 ig_user_id: str | None = None):
         self._token = token
         self._pause_s = pause_s
-        self._http = httpx.Client(base_url=BASE_URL, timeout=30, transport=transport)
+        self.host = HOST if token.startswith("IG") else FB_HOST
+        self.ig_user_id = ig_user_id
+        self._http = httpx.Client(base_url=f"https://{self.host}", timeout=30, transport=transport)
+
+    @property
+    def facebook_mode(self) -> bool:
+        return self.host == FB_HOST
+
+    def _account(self) -> str:
+        if not self.facebook_mode:
+            return "me"
+        if not self.ig_user_id:
+            raise MetaError("Instagram account id is needed for this token")
+        return self.ig_user_id
 
     def _redact(self, text: str) -> str:
         return text.replace(self._token, "<TOKEN>") if self._token else text
@@ -86,22 +108,47 @@ class InstagramClient:
     def get(self, path: str, params: dict | None = None) -> dict:
         return self.request("GET", path, params)
 
+    def discover_ig_accounts(self) -> list[dict]:
+        """Facebook-mode tokens: Instagram accounts the token can reach (via Pages)."""
+        body = self.get("me/accounts", {"fields": "instagram_business_account{id,username}", "limit": 100})
+        out = []
+        for page in body.get("data", []):
+            ig = page.get("instagram_business_account")
+            if isinstance(ig, dict) and ig.get("id"):
+                out.append({"id": str(ig["id"]), "username": ig.get("username")})
+        return out
+
     def me(self) -> dict:
-        return self.get("me", {"fields": "user_id,username,account_type"})
+        if not self.facebook_mode:
+            return self.get("me", {"fields": "user_id,username,account_type"})
+        if not self.ig_user_id:
+            found = self.discover_ig_accounts()
+            if len(found) != 1:
+                raise MetaError("could not determine the Instagram account id for this token")
+            self.ig_user_id = found[0]["id"]
+        body = self.get(self.ig_user_id, {"fields": "id,username"})
+        return {"user_id": body.get("id"), "username": body.get("username"), "account_type": None}
 
     def probe_copyright(self) -> bool:
         """True if the API returns copyright_check_information on at least one video. SPEC open question 1."""
-        page = self.get("me/media", {"fields": f"id,media_type,{COPYRIGHT_FIELD}", "limit": 25})
+        page = self.get(f"{self._account()}/media", {"fields": f"id,media_type,{COPYRIGHT_FIELD}", "limit": 25})
         return any(COPYRIGHT_FIELD in item for item in page.get("data", []))
 
-    def refresh_token(self) -> dict:
+    def refresh_token(self) -> dict | None:
+        """Instagram Login tokens live 60 days and need refreshing; system-user tokens do not expire."""
+        if self.facebook_mode:
+            return None
         return self.get("/refresh_access_token", {"grant_type": "ig_refresh_token"})
 
     def list_media(self, with_copyright: bool) -> MediaPage:
         """All media of the account. complete=False on any error or broken paging."""
         fields = MEDIA_FIELDS + (f",{COPYRIGHT_FIELD}" if with_copyright else "")
         result = MediaPage()
-        path, params = "me/media", {"fields": fields, "limit": 50}
+        try:
+            path, params = f"{self._account()}/media", {"fields": fields, "limit": 50}
+        except MetaError as e:
+            result.error = str(e)
+            return result
         for _ in range(MAX_PAGES):
             try:
                 body = self.get(path, params)
@@ -118,7 +165,7 @@ class InstagramClient:
                 result.complete = True
                 return result
             parts = urlsplit(nxt)
-            if parts.scheme != "https" or parts.netloc != HOST:
+            if parts.scheme != "https" or parts.netloc != self.host:
                 result.error = "paging.next points to another host"
                 return result
             path = parts.path

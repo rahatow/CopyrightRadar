@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import logging
 import shutil
 import tempfile
 from pathlib import Path
@@ -23,6 +24,7 @@ from app.service import Service, _safe
 from app.storage.db import now
 
 WEB = Path(__file__).parent / "web"
+log = logging.getLogger("copyright_radar")
 LANGS = ("de", "en", "ru")
 DISCLAIMER = "Risk levels are indicators, not legal advice."
 MAX_UPLOAD = 4 * 1024 * 1024 * 1024  # 4 GB export
@@ -101,10 +103,11 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
 
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request):
+        q = f"?lang={request.query_params['lang']}" if request.query_params.get("lang") in LANGS else ""
         if not svc.db.get("password_hash"):
-            return RedirectResponse("/setup", 303)
+            return RedirectResponse("/setup" + q, 303)
         if not logged_in(request):
-            return RedirectResponse("/login", 303)
+            return RedirectResponse("/login" + q, 303)
         return page(request, "index.html")
 
     @app.get("/login", response_class=HTMLResponse)
@@ -143,9 +146,11 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
     @app.get("/setup", response_class=HTMLResponse)
     def setup_page(request: Request):
         if svc.db.get("password_hash") and not logged_in(request):
-            return RedirectResponse("/login", 303)
-        return page(request, "setup.html", s=setup_ctx(), msg=request.query_params.get("msg"),
-                    err=request.query_params.get("err"))
+            q = f"?lang={request.query_params['lang']}" if request.query_params.get("lang") in LANGS else ""
+            return RedirectResponse("/login" + q, 303)
+        err = request.query_params.get("err")
+        return page(request, "setup.html", s=setup_ctx(), msg=request.query_params.get("msg"), err=err,
+                    err_detail=svc.db.get("last_setup_error") if err == "token_invalid" else None)
 
     def back(msg: str | None = None, err: str | None = None) -> RedirectResponse:
         q = f"?msg={msg}" if msg else f"?err={err}" if err else ""
@@ -166,13 +171,27 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
         return resp
 
     @app.post("/setup/instagram")
-    def setup_instagram(request: Request, token: str = Form(...), _=Depends(require_write)):
-        token = token.strip()
-        client = svc._ig_factory(token)
+    def setup_instagram(request: Request, token: str = Form(...), ig_user_id: str = Form(""),
+                        _=Depends(require_write)):
+        token = "".join(token.split())  # pasted tokens often carry spaces or line breaks
+        ig_user_id = "".join(ch for ch in ig_user_id if ch.isdigit()) or None
+        client = svc._ig_factory(token, ig_user_id=ig_user_id)
         try:
             me = client.me()
-        except MetaError:
-            return back(err="token_invalid")
+        except MetaError as first:
+            # Second chance on the other Meta host (token kinds are not always recognisable by prefix).
+            from app.instagram.client import FB_HOST, HOST
+            other = HOST if client.host == FB_HOST else FB_HOST
+            client = svc._ig_factory(token, ig_user_id=ig_user_id)
+            client.host = other
+            client._http.base_url = f"https://{other}"
+            try:
+                me = client.me()
+            except MetaError as second:
+                detail = f"{first.code or ''}/{first.subcode or ''} {first} | {second.code or ''}/{second.subcode or ''} {second}"
+                log.warning("setup token check failed: %s", detail)
+                svc.db.set("last_setup_error", detail[:400])
+                return back(err="token_invalid")
         if me.get("account_type") not in ("BUSINESS", "MEDIA_CREATOR", "CREATOR", None):
             return back(err="account_type")
         try:
@@ -181,7 +200,7 @@ def create_app(settings: Settings | None = None, service: Service | None = None)
             supported = False
         svc.secrets.put("instagram_token", token)
         svc.db.set("account", {"username": me.get("username"), "user_id": str(me.get("user_id") or me.get("id")),
-                               "account_type": me.get("account_type")})
+                               "account_type": me.get("account_type"), "api_host": client.host})
         svc.db.set("meta_copyright_supported", supported)
         svc.db.audit("instagram_connected", {"copyright_field": supported})
         return back(msg="instagram_saved")
